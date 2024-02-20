@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(SimpleAnimation))]
 public class SimpleAnimationEditor : Editor
@@ -10,8 +10,6 @@ public class SimpleAnimationEditor : Editor
         public static GUIContent animations = new GUIContent("Animations", "These clips will define the States the component will start with");
         public static GUIContent playAutomatically = new GUIContent("Play Automatically", "If checked, the default clip will automatically be played");
         public static GUIContent animatePhysics = new GUIContent("Animate Physics", "If checked, animations will be updated at the same frequency as Fixed Update");
-
-        public static GUIContent cullingMode = new GUIContent("Culling Mode", "Controls what is updated when the object has been culled");
     }
 
     SerializedProperty clip;
@@ -26,7 +24,6 @@ public class SimpleAnimationEditor : Editor
         states = serializedObject.FindProperty("m_States");
         playAutomatically = serializedObject.FindProperty("m_PlayAutomatically");
         animatePhysics = serializedObject.FindProperty("m_AnimatePhysics");
-        cullingMode = serializedObject.FindProperty("m_CullingMode");
     }
 
     public override void OnInspectorGUI()
@@ -36,13 +33,11 @@ public class SimpleAnimationEditor : Editor
         EditorGUILayout.PropertyField(states, Styles.animations, true);
         EditorGUILayout.PropertyField(playAutomatically, Styles.playAutomatically);
         EditorGUILayout.PropertyField(animatePhysics, Styles.animatePhysics);
-        EditorGUILayout.PropertyField(cullingMode, Styles.cullingMode);
-
 
         serializedObject.ApplyModifiedProperties();
     }
 
-    
+
 }
 
 [CustomPropertyDrawer(typeof(SimpleAnimation.EditorState))]
@@ -74,13 +69,13 @@ class StateDrawer : PropertyDrawer
 
 
         EditorGUI.BeginDisabledGroup(property.FindPropertyRelative("defaultState").boolValue);
-            EditorGUI.PropertyField(nameRect, property.FindPropertyRelative("clip"), GUIContent.none);
-            EditorGUI.PropertyField(clipRect, property.FindPropertyRelative("name"), GUIContent.none);
-            if (property.FindPropertyRelative("defaultState").boolValue)
-            {
-                EditorGUI.LabelField(position, Styles.disabledTooltip);
-            }
-        
+        EditorGUI.PropertyField(nameRect, property.FindPropertyRelative("clip"), GUIContent.none);
+        EditorGUI.PropertyField(clipRect, property.FindPropertyRelative("name"), GUIContent.none);
+        if (property.FindPropertyRelative("defaultState").boolValue)
+        {
+            EditorGUI.LabelField(position, Styles.disabledTooltip);
+        }
+
         EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.EndHorizontal();

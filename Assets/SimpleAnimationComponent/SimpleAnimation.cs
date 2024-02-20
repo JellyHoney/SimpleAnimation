@@ -1,11 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 
 [RequireComponent(typeof(Animator))]
-public partial class SimpleAnimation: MonoBehaviour
+public partial class SimpleAnimation : MonoBehaviour
 {
     public interface State
     {
@@ -41,8 +38,8 @@ public partial class SimpleAnimation: MonoBehaviour
 
     public AnimatorCullingMode cullingMode
     {
-        get { return animator.cullingMode; }
-        set { m_CullingMode = value;  animator.cullingMode = m_CullingMode; }
+        get => animator.cullingMode;
+        set { animator.cullingMode = value; }
     }
 
     public bool isPlaying { get { return m_Playable.IsPlaying(); } }
@@ -60,7 +57,7 @@ public partial class SimpleAnimation: MonoBehaviour
         {
             LegacyClipCheck(value);
             m_Clip = value;
-        }  
+        }
     }
 
     public WrapMode wrapMode
@@ -79,7 +76,7 @@ public partial class SimpleAnimation: MonoBehaviour
     {
         m_Animator.enabled = true;
         Kick();
-        m_Playable.Blend(stateName, targetWeight,  fadeLength);
+        m_Playable.Blend(stateName, targetWeight, fadeLength);
     }
 
     public void CrossFade(string stateName, float fadeLength)
@@ -140,7 +137,7 @@ public partial class SimpleAnimation: MonoBehaviour
         {
             RebuildStates();
         }
-        
+
     }
 
     public void RemoveState(string name)
@@ -170,11 +167,11 @@ public partial class SimpleAnimation: MonoBehaviour
         if (clip == null)
             throw new System.NullReferenceException("clip");
 
-        if ( m_Playable.RemoveClip(clip) )
+        if (m_Playable.RemoveClip(clip))
         {
             RebuildStates();
         }
-       
+
     }
 
     public void Rewind()
