@@ -230,7 +230,7 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
         m_Animator = GetComponent<Animator>();
         m_Animator.updateMode = m_AnimatePhysics ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal;
         m_Animator.cullingMode = m_CullingMode;
-        m_Graph = PlayableGraph.Create();
+        m_Graph = PlayableGraph.Create(this.gameObject.name);
         m_Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
         SimpleAnimationPlayable template = new SimpleAnimationPlayable();
 
