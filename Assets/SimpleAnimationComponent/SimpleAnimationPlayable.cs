@@ -1,9 +1,7 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
 using UnityEngine.Animations;
-using System;
+using UnityEngine.Playables;
 
 public partial class SimpleAnimationPlayable : PlayableBehaviour
 {
@@ -70,7 +68,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
     {
         m_ActualPlayable = playable;
 
-        var mixer = AnimationMixerPlayable.Create(graph, 1, true);
+        var mixer = AnimationMixerPlayable.Create(graph, 1);
         m_Mixer = mixer;
 
         self.SetInputCount(1);
@@ -335,7 +333,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
 
     public int GetClipCount()
     {
-        int count=0;
+        int count = 0;
         for (int i = 0; i < m_States.Count; i++)
         {
             if (m_States[i] != null)
@@ -642,11 +640,11 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             float speed = state.speed;
             float stateTime = m_States.GetStateTime(state.index);
             float remainingTime;
-            if (speed > 0 )
+            if (speed > 0)
             {
                 remainingTime = (state.clip.length - stateTime) / speed;
             }
-            else if(speed < 0 )
+            else if (speed < 0)
             {
                 remainingTime = (stateTime) / speed;
             }
@@ -683,7 +681,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         float remainingTime = -1f;
 
         var it = m_StateQueue.First;
-        while(it != null)
+        while (it != null)
         {
             if (mustCalculateQueueTimes)
             {

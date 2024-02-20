@@ -1,16 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
-using UnityEngine.Animations;
-using System;
 
 public partial class SimpleAnimationPlayable : PlayableBehaviour
 {
     private int m_StatesVersion = 0;
 
     private void InvalidateStates() { m_StatesVersion++; }
-    private class StateEnumerable: IEnumerable<IState>
+    private class StateEnumerable : IEnumerable<IState>
     {
         private SimpleAnimationPlayable m_Owner;
         public StateEnumerable(SimpleAnimationPlayable owner)
@@ -82,7 +81,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
             }
         }
     }
-    
+
     public interface IState
     {
         bool IsValid();
@@ -319,12 +318,12 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
 
         public void Pause()
         {
-            m_Playable.SetPlayState(PlayState.Paused);
+            m_Playable.Pause();
         }
 
         public void Play()
         {
-            m_Playable.SetPlayState(PlayState.Playing);
+            m_Playable.Play();
         }
 
         public void Stop()
@@ -342,10 +341,10 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
 
         public void ForceWeight(float weight)
         {
-           m_TargetWeight = weight;
-           m_Fading = false;
-           m_FadeSpeed = 0f;
-           SetWeight(weight);
+            m_TargetWeight = weight;
+            m_Fading = false;
+            m_FadeSpeed = 0f;
+            SetWeight(weight);
         }
 
         public void SetWeight(float weight)
@@ -498,7 +497,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         public bool weightDirty { get { return m_WeightDirty; } }
 
         public void ResetDirtyFlags()
-        { 
+        {
             m_EnabledDirty = false;
             m_WeightDirty = false;
         }
@@ -608,7 +607,7 @@ public partial class SimpleAnimationPlayable : PlayableBehaviour
         {
             StateInfo state = m_States[index];
             state.SetWeight(weight);
-           
+
         }
 
         public void SetStateTime(int index, float time)
