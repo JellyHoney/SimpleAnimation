@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Animator))]
 public partial class SimpleAnimation : MonoBehaviour
 {
+    private string mDefaultStateName;
     public interface State
     {
         bool enabled { get; set; }
@@ -32,8 +33,8 @@ public partial class SimpleAnimation : MonoBehaviour
 
     public bool animatePhysics
     {
-        get { return m_AnimatePhysics; }
-        set { m_AnimatePhysics = value; animator.updateMode = m_AnimatePhysics ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal; }
+        get { return animator.updateMode == AnimatorUpdateMode.AnimatePhysics; }
+        set { animator.updateMode = value ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal; }
     }
 
     public AnimatorCullingMode cullingMode
@@ -124,7 +125,7 @@ public partial class SimpleAnimation : MonoBehaviour
         Kick();
         if (m_Clip != null && m_PlayAutomatically)
         {
-            m_Playable.Play(kDefaultStateName);
+            m_Playable.Play(mDefaultStateName);
         }
         return false;
     }
@@ -137,7 +138,6 @@ public partial class SimpleAnimation : MonoBehaviour
         {
             RebuildStates();
         }
-
     }
 
     public void RemoveState(string name)

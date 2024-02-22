@@ -9,21 +9,17 @@ public class SimpleAnimationEditor : Editor
         public static GUIContent animation = new GUIContent("Animation", "The clip that will be played if Play() is called, or if \"Play Automatically\" is enabled");
         public static GUIContent animations = new GUIContent("Animations", "These clips will define the States the component will start with");
         public static GUIContent playAutomatically = new GUIContent("Play Automatically", "If checked, the default clip will automatically be played");
-        public static GUIContent animatePhysics = new GUIContent("Animate Physics", "If checked, animations will be updated at the same frequency as Fixed Update");
     }
 
     SerializedProperty clip;
     SerializedProperty states;
     SerializedProperty playAutomatically;
-    SerializedProperty animatePhysics;
-    SerializedProperty cullingMode;
 
     void OnEnable()
     {
         clip = serializedObject.FindProperty("m_Clip");
         states = serializedObject.FindProperty("m_States");
         playAutomatically = serializedObject.FindProperty("m_PlayAutomatically");
-        animatePhysics = serializedObject.FindProperty("m_AnimatePhysics");
     }
 
     public override void OnInspectorGUI()
@@ -32,12 +28,8 @@ public class SimpleAnimationEditor : Editor
         EditorGUILayout.PropertyField(clip, Styles.animation);
         EditorGUILayout.PropertyField(states, Styles.animations, true);
         EditorGUILayout.PropertyField(playAutomatically, Styles.playAutomatically);
-        EditorGUILayout.PropertyField(animatePhysics, Styles.animatePhysics);
-
         serializedObject.ApplyModifiedProperties();
     }
-
-
 }
 
 [CustomPropertyDrawer(typeof(SimpleAnimation.EditorState))]
@@ -67,16 +59,8 @@ class StateDrawer : PropertyDrawer
         Rect clipRect = new Rect(position.x, position.y, position.width/2 - 5, position.height);
         Rect nameRect = new Rect(position.x + position.width/2 + 5, position.y, position.width/2 - 5, position.height);
 
-
-        EditorGUI.BeginDisabledGroup(property.FindPropertyRelative("defaultState").boolValue);
         EditorGUI.PropertyField(nameRect, property.FindPropertyRelative("clip"), GUIContent.none);
         EditorGUI.PropertyField(clipRect, property.FindPropertyRelative("name"), GUIContent.none);
-        if (property.FindPropertyRelative("defaultState").boolValue)
-        {
-            EditorGUI.LabelField(position, Styles.disabledTooltip);
-        }
-
-        EditorGUI.EndDisabledGroup();
 
         EditorGUILayout.EndHorizontal();
         // Set indent back to what it was

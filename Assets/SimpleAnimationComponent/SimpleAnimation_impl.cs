@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -11,7 +13,6 @@ using UnityEngine.Playables;
 [RequireComponent(typeof(Animator))]
 public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
 {
-    const string kDefaultStateName = "Default";
     private class StateEnumerable : IEnumerable<State>
     {
         private SimpleAnimation m_Owner;
@@ -155,7 +156,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
     {
         public AnimationClip clip;
         public string name;
-        public bool defaultState;
     }
 
     protected void Kick()
@@ -178,9 +178,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
 
     [SerializeField]
     protected bool m_PlayAutomatically = true;
-
-    [SerializeField]
-    protected bool m_AnimatePhysics = false;
 
     [SerializeField]
     protected WrapMode m_WrapMode;
@@ -225,7 +222,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
             return;
 
         m_Animator = GetComponent<Animator>();
-        m_Animator.updateMode = m_AnimatePhysics ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal;
         m_Graph = PlayableGraph.Create(this.gameObject.name);
         m_Graph.SetTimeUpdateMode(DirectorUpdateMode.GameTime);
         SimpleAnimationPlayable template = new SimpleAnimationPlayable();
@@ -233,14 +229,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
         var playable = ScriptPlayable<SimpleAnimationPlayable>.Create(m_Graph, template, 1);
         m_Playable = playable.GetBehaviour();
         m_Playable.onDone += OnPlayableDone;
-        if (m_States == null)
-        {
-            m_States = new EditorState[1];
-            m_States[0] = new EditorState();
-            m_States[0].defaultState = true;
-            m_States[0].name = "Default";
-        }
-
 
         if (m_States != null)
         {
@@ -248,12 +236,13 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
             {
                 if (state.clip)
                 {
+                    if (state.clip == clip)
+                        mDefaultStateName = state.name;
+
                     m_Playable.AddClip(state.clip, state.name);
                 }
             }
         }
-
-        EnsureDefaultStateExists();
 
         AnimationPlayableOutput output = AnimationPlayableOutput.Create(m_Graph, "AnimationClip", animator);
         output.SetSourcePlayable(playable, 0);
@@ -261,15 +250,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
         Play();
         Kick();
         m_Initialized = true;
-    }
-
-    private void EnsureDefaultStateExists()
-    {
-        if (m_Playable != null && m_Clip != null && m_Playable.GetState(kDefaultStateName) == null)
-        {
-            m_Playable.AddClip(m_Clip, kDefaultStateName);
-            Kick();
-        }
     }
 
     protected virtual void Awake()
@@ -305,16 +285,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
         m_States = list.ToArray();
     }
 
-    EditorState CreateDefaultEditorState()
-    {
-        var defaultState = new EditorState();
-        defaultState.name = "Default";
-        defaultState.clip = m_Clip;
-        defaultState.defaultState = true;
-
-        return defaultState;
-    }
-
     static void LegacyClipCheck(AnimationClip clip)
     {
         if (clip && clip.legacy)
@@ -340,40 +310,19 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
             m_Clip = null;
         }
 
-        //Ensure at least one state exists
-        if (m_States == null || m_States.Length == 0)
+        //Make sure default clip exist in m_States
+        if (m_Clip != null)
         {
-            m_States = new EditorState[1];
-        }
-
-        //Create default state if it's null
-        if (m_States[0] == null)
-        {
-            m_States[0] = CreateDefaultEditorState();
-        }
-
-        //If first state is not the default state, create a new default state at index 0 and push back the rest
-        if (m_States[0].defaultState == false || m_States[0].name != "Default")
-        {
-            var oldArray = m_States;
-            m_States = new EditorState[oldArray.Length + 1];
-            m_States[0] = CreateDefaultEditorState();
-            oldArray.CopyTo(m_States, 1);
-        }
-
-        //If default clip changed, update the default state
-        if (m_States[0].clip != m_Clip)
-            m_States[0].clip = m_Clip;
-
-
-        //Make sure only one state is default
-        for (int i = 1; i < m_States.Length; i++)
-        {
-            if (m_States[i] == null)
+            var state = m_States.FirstOrDefault((state) => state.clip == m_Clip);
+            if (state == null)
             {
-                m_States[i] = new EditorState();
+                var oldArray = m_States;
+                m_States = new EditorState[oldArray.Length + 1];
+                m_States[0] = new EditorState();
+                m_States[0].name = clip.name;
+                m_States[0].clip = clip;
+                oldArray.CopyTo(m_States, 1);
             }
-            m_States[i].defaultState = false;
         }
 
         //Ensure state names are unique
@@ -401,7 +350,6 @@ public partial class SimpleAnimation : MonoBehaviour, IAnimationClipSource
         }
 
         m_Animator = GetComponent<Animator>();
-        m_Animator.updateMode = m_AnimatePhysics ? AnimatorUpdateMode.AnimatePhysics : AnimatorUpdateMode.Normal;
     }
 
     public void GetAnimationClips(List<AnimationClip> results)
